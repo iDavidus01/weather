@@ -1,27 +1,22 @@
-from backend.models import WeatherData, AirQualityData
-from backend.repositories import DataRepository
-from typing import Union
+from .repositories import DataRepository
+from .models import WeatherData, AirQualityData
 
 class DataService:
     def __init__(self, repository: DataRepository):
         self.repository = repository
 
-    def save_weather(self, data_dict: dict) -> WeatherData:
-        data = WeatherData(**data_dict)
-        self.repository.add_weather(data)
-        return data
+    def save_weather(self, data: dict) -> WeatherData:
+        weather = WeatherData(**data)
+        return self.repository.add_weather(weather)
 
-    def save_air_quality(self, data_dict: dict) -> AirQualityData:
-        data = AirQualityData(**data_dict)
-        self.repository.add_air_quality(data)
-        return data
+    def save_air_quality(self, data: dict) -> AirQualityData:
+        air_quality = AirQualityData(**data)
+        return self.repository.add_air_quality(air_quality)
 
-    def get_closest_reading(self, timestamp: str, data_type: str) -> Union[WeatherData, AirQualityData, None]:
-        from datetime import datetime
-        dt = datetime.fromisoformat(timestamp)
+    def get_closest_reading(self, timestamp: str, data_type: str):
         if data_type == "weather":
-            return self.repository.get_closest_weather(dt)
+            return self.repository.get_weather_closest(timestamp)
         elif data_type == "air_quality":
-            return self.repository.get_closest_air_quality(dt)
+            return self.repository.get_air_quality_closest(timestamp)
         else:
             return None

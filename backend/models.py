@@ -1,32 +1,31 @@
-from pydantic import BaseModel, Field, validator # type: ignore
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
-from typing import Optional
-
-class AirQualityData(BaseModel):
-    timestamp: datetime = Field(..., alias="time")
-    pm10: Optional[float]
-    pm2_5: Optional[float]
 
 class WeatherData(BaseModel):
-    timestamp: datetime = Field(..., alias="time")
-    temperature_celsius: float
-    pressure_hpa: float
-    humidity_percent: float
+    timestamp: datetime
+    temperature_celsius: float = Field(...)
+    pressure_hpa: float = Field(...)
+    humidity_percent: float = Field(...)
 
-    @validator("temperature_celsius")
-    def temp_valid(cls, v):
-        if not (-50 <= v <= 60):
-            raise ValueError("Temperature out of realistic range")
+    @validator('temperature_celsius')
+    def check_temperature(cls, v):
+        if not (-90 <= v <= 60):
+            raise ValueError("temperature out of realistic range")
         return v
 
-    @validator("pressure_hpa")
-    def pressure_valid(cls, v):
+    @validator('pressure_hpa')
+    def check_pressure(cls, v):
         if not (300 <= v <= 1100):
-            raise ValueError("Pressure out of realistic range")
+            raise ValueError("pressure out of realistic range")
         return v
 
-    @validator("humidity_percent")
-    def humidity_valid(cls, v):
+    @validator('humidity_percent')
+    def check_humidity(cls, v):
         if not (0 <= v <= 100):
-            raise ValueError("Humidity out of realistic range")
+            raise ValueError("humidity must be 0-100%")
         return v
+
+class AirQualityData(BaseModel):
+    timestamp: datetime
+    pm10: float
+    pm2_5: float
